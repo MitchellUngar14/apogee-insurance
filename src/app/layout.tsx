@@ -36,6 +36,11 @@ export default function RootLayout({
             </div>
           </header>
           <main className="container mx-auto p-4">{children}</main>
+          <footer className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 p-4 text-center text-sm mt-8">
+            <p>
+              &copy; {new Date().getFullYear()} Mitchell Ungar. All Rights Reserved.
+            </p>
+          </footer>
         </HeaderProvider>
       </body>
     </html>
