@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { HeaderProvider } from '@/context/HeaderContext'; // Import HeaderProvider
+import DynamicHeader from '@/components/DynamicHeader'; // Import DynamicHeader
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +29,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <HeaderProvider> {/* Wrap children with HeaderProvider */}
+          <header className="bg-soft-blue-500 text-white p-4 shadow-md">
+            <div className="container mx-auto">
+              <DynamicHeader /> {/* Use DynamicHeader component */}
+            </div>
+          </header>
+          <main className="container mx-auto p-4">{children}</main>
+        </HeaderProvider>
       </body>
     </html>
   );

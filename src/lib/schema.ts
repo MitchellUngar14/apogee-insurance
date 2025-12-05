@@ -36,6 +36,7 @@ export const applicants = pgTable('applicants', {
   fullName: varchar('full_name', { length: 256 }).notNull(),
   email: varchar('email', { length: 256 }).unique().notNull(),
   groupId: integer('group_id').references(() => groups.id), // Foreign key to groups table
+  quoteType: quoteTypeEnum('quote_type'), // 'Individual' or 'Group'
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

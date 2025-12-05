@@ -1,0 +1,1 @@
+ALTER TABLE "applicants" ADD COLUMN "quote_type" "quote_type";
