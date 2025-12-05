@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react'; // Import useEffect
-import { useSearchParams } from 'next/navigation'; // Import useSearchParams
+import { useSearchParams, useRouter } from 'next/navigation'; // Import useSearchParams and useRouter
 import QuoteStart from '@/components/QuoteStart';
 import Wizard from '@/components/Wizard';
 import IndividualDetailsForm from '@/components/IndividualDetailsForm';
@@ -20,6 +20,7 @@ import { useHeader } from '@/context/HeaderContext'; // Import useHeader
 export default function Home() {
   const { setHeaderTitle, setShowHomeButton, showHomeButton } = useHeader();
   const searchParams = useSearchParams();
+  const router = useRouter(); // Initialize useRouter
 
   // Initialize states based on URL params on first render
   const [showIntroScreen, setShowIntroScreen] = useState(() => !searchParams.get('platform'));
@@ -101,6 +102,7 @@ export default function Home() {
     setShowViewBenefits(false);
     setHeaderTitle("Apogee Insurance");
     setShowHomeButton(false);
+    router.push('/'); // Navigate to base URL to clear query params
   };
 
   const handleBackToQuotingPlatformHome = () => { // Only stop showing existing quotes

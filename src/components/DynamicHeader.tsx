@@ -14,6 +14,7 @@ export default function DynamicHeader() {
   const handleGoHome = () => {
     setHeaderTitle("Apogee Insurance");
     setShowHomeButton(false);
+    router.push('/'); // Navigate to base URL to clear query params
   };
 
   const toggleDarkMode = () => {
@@ -69,7 +70,7 @@ export default function DynamicHeader() {
             className="px-4 py-2 text-white text-sm rounded-md hover:bg-soft-green-600 transition-colors"
             style={{ backgroundColor: '#22c55e' }}
           >
-            Home
+            🏠 Home
           </button>
         )}
         <h1 className="text-2xl font-bold flex-grow text-center">
