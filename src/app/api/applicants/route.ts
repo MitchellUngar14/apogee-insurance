@@ -1,7 +1,7 @@
 // src/app/api/applicants/route.ts
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { applicants } from '@/lib/schema';
+import { applicants, quotes } from '@/lib/schema'; // Ensure quotes is imported for quote creation
 import { eq } from 'drizzle-orm';
 
 export async function GET() {
@@ -20,18 +20,32 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { fullName, email, groupId, quoteType } = body; // Get quoteType from body
+    const { firstName, middleName, lastName, birthdate, phoneNumber, email, groupId, quoteType } = body;
 
-    if (!fullName || !email || !quoteType) {
+    if (!firstName || !lastName || !birthdate || !email || !quoteType) {
       return NextResponse.json(
-        { message: 'Full name, email, and quote type are required' },
+        { message: 'First name, last name, birthdate, email, and quote type are required' },
         { status: 400 }
       );
     }
 
+    // Parse birthdate string (YYYY-MM-DD) and create a UTC date object to avoid timezone issues
+    const [year, month, day] = birthdate.split('-').map(Number);
+    const utcBirthdate = new Date(Date.UTC(year, month - 1, day)); // month - 1 because months are 0-indexed
+
     const newApplicant = await db
       .insert(applicants)
-      .values({ fullName, email, groupId, quoteType })
+      .values({
+        firstName,
+        middleName,
+        lastName,
+        birthdate: utcBirthdate,
+        phoneNumber,
+        email,
+        groupId,
+        quoteType,
+        status: 'Incomplete', // Set initial status
+      })
       .returning();
 
     if (!newApplicant[0]) {

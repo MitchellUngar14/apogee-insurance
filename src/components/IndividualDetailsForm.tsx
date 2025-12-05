@@ -5,9 +5,12 @@ import React, { useState, useEffect } from 'react';
 
 type IndividualDetailsFormProps = {
   initialData?: {
-    fullName: string;
+    firstName: string;
+    middleName?: string;
+    lastName: string;
+    birthdate: string; // Will be YYYY-MM-DD for input type="date"
+    phoneNumber?: string;
     email: string;
-    // Add more fields as needed, e.g., phone, address
   };
   onNext: (data: any) => void;
   onPrevious: () => void;
@@ -23,14 +26,21 @@ export default function IndividualDetailsForm({
   isLastStep,
 }: IndividualDetailsFormProps) {
   const [formData, setFormData] = useState({
-    fullName: initialData?.fullName || '',
+    firstName: initialData?.firstName || '',
+    middleName: initialData?.middleName || '',
+    lastName: initialData?.lastName || '',
+    birthdate: initialData?.birthdate || '',
+    phoneNumber: initialData?.phoneNumber || '',
     email: initialData?.email || '',
   });
 
   useEffect(() => {
-    // Update form data if initialData changes (e.g., when navigating back and forth)
     setFormData({
-      fullName: initialData?.fullName || '',
+      firstName: initialData?.firstName || '',
+      middleName: initialData?.middleName || '',
+      lastName: initialData?.lastName || '',
+      birthdate: initialData?.birthdate || '',
+      phoneNumber: initialData?.phoneNumber || '',
       email: initialData?.email || '',
     });
   }, [initialData]);
@@ -42,29 +52,88 @@ export default function IndividualDetailsForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Add validation here
+    // Basic validation
+    if (!formData.firstName || !formData.lastName || !formData.birthdate || !formData.email) {
+      alert('Please fill in all required fields (First Name, Last Name, Birthdate, Email).');
+      return;
+    }
+    // TODO: Add more robust validation, e.g., email format, date format, phone format
     onNext(formData);
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="fullName" className="block text-sm font-medium form-label">
-          Full Name
+        <label htmlFor="firstName" className="block text-sm font-medium form-label">
+          First Name <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
-          name="fullName"
-          id="fullName"
-          value={formData.fullName}
+          name="firstName"
+          id="firstName"
+          value={formData.firstName}
           onChange={handleChange}
           required
           className="mt-1 block w-full rounded-md shadow-sm p-2"
         />
       </div>
       <div>
+        <label htmlFor="middleName" className="block text-sm font-medium form-label">
+          Middle Name (Optional)
+        </label>
+        <input
+          type="text"
+          name="middleName"
+          id="middleName"
+          value={formData.middleName}
+          onChange={handleChange}
+          className="mt-1 block w-full rounded-md shadow-sm p-2"
+        />
+      </div>
+      <div>
+        <label htmlFor="lastName" className="block text-sm font-medium form-label">
+          Last Name <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          name="lastName"
+          id="lastName"
+          value={formData.lastName}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md shadow-sm p-2"
+        />
+      </div>
+      <div>
+        <label htmlFor="birthdate" className="block text-sm font-medium form-label">
+          Birthdate <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="date"
+          name="birthdate"
+          id="birthdate"
+          value={formData.birthdate}
+          onChange={handleChange}
+          required
+          className="mt-1 block w-full rounded-md shadow-sm p-2"
+        />
+      </div>
+      <div>
+        <label htmlFor="phoneNumber" className="block text-sm font-medium form-label">
+          Phone Number (Optional)
+        </label>
+        <input
+          type="tel"
+          name="phoneNumber"
+          id="phoneNumber"
+          value={formData.phoneNumber}
+          onChange={handleChange}
+          className="mt-1 block w-full rounded-md shadow-sm p-2"
+        />
+      </div>
+      <div>
         <label htmlFor="email" className="block text-sm font-medium form-label">
-          Email
+          Email <span className="text-red-500">*</span>
         </label>
         <input
           type="email"

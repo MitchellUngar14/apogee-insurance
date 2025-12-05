@@ -20,6 +20,9 @@ export const quoteStatusEnum = pgEnum('quote_status', [
 // Enum for Quote Type
 export const quoteTypeEnum = pgEnum('quote_type', ['Individual', 'Group']);
 
+// Enum for Applicant Status
+export const applicantStatusEnum = pgEnum('applicant_status', ['Incomplete', 'Complete']);
+
 // --- Tables ---
 
 // Groups Table: Stores information about the company or group.
@@ -33,10 +36,15 @@ export const groups = pgTable('groups', {
 // Can be linked to a group.
 export const applicants = pgTable('applicants', {
   id: serial('id').primaryKey(),
-  fullName: varchar('full_name', { length: 256 }).notNull(),
+  firstName: varchar('first_name', { length: 256 }).notNull(),
+  middleName: varchar('middle_name', { length: 256 }), // Optional
+  lastName: varchar('last_name', { length: 256 }).notNull(),
+  birthdate: timestamp('birthdate', { mode: 'date' }).notNull(), // Use mode: 'date' for Date objects
+  phoneNumber: varchar('phone_number', { length: 20 }), // Optional
   email: varchar('email', { length: 256 }).unique().notNull(),
   groupId: integer('group_id').references(() => groups.id), // Foreign key to groups table
   quoteType: quoteTypeEnum('quote_type'), // 'Individual' or 'Group'
+  status: applicantStatusEnum('status').default('Incomplete').notNull(), // New status field
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 

@@ -6,10 +6,12 @@ import { eq } from 'drizzle-orm';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
-    const quoteId = parseInt(params.id, 10);
+    const resolvedParams = await Promise.resolve(context.params); // Explicitly await context.params
+    const { id } = resolvedParams;
+    const quoteId = parseInt(id, 10);
     if (isNaN(quoteId)) {
       return NextResponse.json({ message: 'Invalid Quote ID' }, { status: 400 });
     }
@@ -69,7 +71,7 @@ export async function GET(
   } catch (error) {
     console.error(`Error fetching quote ${params.id}:`, error);
     return NextResponse.json(
-      { message: 'Internal Server Error', error: (error as Error).message },
+      { message: 'Internal Server Error', error: error }, // Log full error object
       { status: 500 }
     );
   }
