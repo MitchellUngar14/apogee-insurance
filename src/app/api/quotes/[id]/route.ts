@@ -76,3 +76,47 @@ export async function GET(
     );
   }
 }
+
+export async function PATCH(
+  request: Request,
+  context: { params: { id: string } }
+) {
+  try {
+    const resolvedParams = await Promise.resolve(context.params); // Explicitly await context.params
+    const { id } = resolvedParams;
+    const quoteId = parseInt(id, 10);
+
+    if (isNaN(quoteId)) {
+      return NextResponse.json({ message: 'Invalid Quote ID' }, { status: 400 });
+    }
+
+    const body = await request.json();
+    const { status, type } = body; // Fields that can be updated for a quote
+
+    const updateData: Record<string, any> = {};
+    if (status !== undefined) updateData.status = status;
+    if (type !== undefined) updateData.type = type;
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ message: 'No fields to update' }, { status: 400 });
+    }
+
+    const updatedQuotes = await db
+      .update(quotes)
+      .set(updateData)
+      .where(eq(quotes.id, quoteId))
+      .returning();
+
+    if (!updatedQuotes.length) {
+      return NextResponse.json({ message: 'Quote not found or no changes made' }, { status: 404 });
+    }
+
+    return NextResponse.json(updatedQuotes[0], { status: 200 });
+  } catch (error) {
+    console.error(`Error updating quote ${context.params.id}:`, error);
+    return NextResponse.json(
+      { message: 'Internal Server Error', error: error },
+      { status: 500 }
+    );
+  }
+}

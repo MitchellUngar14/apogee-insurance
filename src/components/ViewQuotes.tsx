@@ -138,7 +138,7 @@ export default function ViewQuotes({ onBack }: ViewQuotesProps) {
   };
 
   const handleQuoteClick = (quoteId: number) => {
-    router.push(`/quotes/${quoteId}`);
+    router.push(`/quotes/${quoteId}?from=quoting`);
   };
 
   if (loading) {

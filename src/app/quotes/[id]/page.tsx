@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams, useRouter } from 'next/navigation'; // Import useRouter
 import React, { useState, useEffect } from 'react';
 import EditQuoteForm from '@/components/EditQuoteForm'; // Import EditQuoteForm
 import EditApplicantForm from '@/components/EditApplicantForm'; // Import EditApplicantForm
@@ -62,7 +62,10 @@ interface QuoteDetails {
 
 export default function QuoteDetailPage() {
   const params = useParams();
+  const searchParams = useSearchParams(); // Use useSearchParams to get query params
+  const router = useRouter(); // Initialize useRouter
   const quoteId = params.id;
+  const fromPage = searchParams.get('from'); // Get the 'from' query parameter
 
   const [quoteDetails, setQuoteDetails] = useState<QuoteDetails | null>(null);
   const [loading, setLoading] = useState(true);
@@ -70,46 +73,83 @@ export default function QuoteDetailPage() {
   const [editingQuote, setEditingQuote] = useState(false); // State for editing quote info
   const [editingApplicant, setEditingApplicant] = useState(false); // State for editing applicant info
 
-  useEffect(() => {
+  // Move fetchQuoteDetails outside useEffect to be accessible by handlers
+  async function fetchQuoteDetails() {
     if (!quoteId) {
       setError('Quote ID is missing.');
       setLoading(false);
       return;
     }
-
-    async function fetchQuoteDetails() {
-      try {
-        const response = await fetch(`/api/quotes/${quoteId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch quote details.');
-        }
-        const data: QuoteDetails = await response.json();
-        setQuoteDetails(data);
-      } catch (err) {
-        setError((err as Error).message);
+    setLoading(true); // Set loading true before fetch
+    setError(null); // Clear previous errors
+    try {
+      const response = await fetch(`/api/quotes/${quoteId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch quote details.');
       }
-      finally {
-        setLoading(false);
-      }
+      const data: QuoteDetails = await response.json();
+      setQuoteDetails(data);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    fetchQuoteDetails();
+  useEffect(() => {
+    fetchQuoteDetails(); // Call the function from useEffect
   }, [quoteId]);
 
-  const handleSaveQuote = (updatedData: any) => {
-    console.log('Saving updated quote:', updatedData);
-    // Here, you would typically call your API to save the data
-    // For now, we'll just update the local state and close the editor
-    setQuoteDetails((prev) => prev ? { ...prev, quote: { ...prev.quote, ...updatedData } } : null);
-    setEditingQuote(false);
+  const handleSaveQuote = async (updatedData: Partial<Quote>) => {
+    try {
+      const response = await fetch(`/api/quotes/${quoteId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save quote changes.');
+      }
+
+      // alert('Quote updated successfully!'); // Removed alert
+      setEditingQuote(false);
+      // Re-fetch details to ensure all data is up-to-date
+      fetchQuoteDetails();
+    } catch (err) {
+      console.error('Error saving quote:', err);
+      alert((err as Error).message);
+    }
   };
 
-  const handleSaveApplicant = (updatedData: any) => {
-    console.log('Saving updated applicant:', updatedData);
-    // Here, you would typically call your API to save the data
-    // For now, we'll just update the local state and close the editor
-    setQuoteDetails((prev) => prev ? { ...prev, applicant: { ...prev.applicant, ...updatedData } } : null);
-    setEditingApplicant(false);
+  const handleSaveApplicant = async (updatedData: Partial<Applicant>) => {
+    if (!applicant || !applicant.id) {
+      alert('Applicant ID missing for save operation.');
+      return;
+    }
+    try {
+      const response = await fetch(`/api/applicants/${applicant.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save applicant changes.');
+      }
+
+      // alert('Applicant updated successfully!'); // Removed alert
+      setEditingApplicant(false);
+      // Re-fetch details to ensure all data is up-to-date
+      fetchQuoteDetails();
+    } catch (err) {
+      console.error('Error saving applicant:', err);
+      alert((err as Error).message);
+    }
   };
 
   if (loading) {
@@ -145,6 +185,14 @@ export default function QuoteDetailPage() {
       />
     );
   }
+
+  const isFromCustomerService = fromPage === 'customer-service';
+  const buttonText = isFromCustomerService ? '← Back to Customer Service' : '← Back to Quotes';
+  const buttonBgColor = isFromCustomerService ? '#0284c7' : '#22c55e'; // Blue or Green
+  const buttonHoverColor = isFromCustomerService ? 'hover:bg-soft-blue-600' : 'hover:bg-soft-green-600';
+
+  const backUrl = isFromCustomerService ? '/?platform=customer-service' : '/?platform=quoting';
+
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-[var(--background)] white-shadow rounded-lg p-6 my-8">
@@ -226,11 +274,11 @@ export default function QuoteDetailPage() {
       )}
 
       <button
-        onClick={() => window.history.back()}
-        className="mt-6 px-6 py-2 text-white rounded-md hover:bg-soft-green-600 transition-colors"
-        style={{ backgroundColor: '#22c55e' }}
+        onClick={() => router.push(backUrl)} // Use router.push with dynamic URL
+        className={`mt-6 px-6 py-2 text-white rounded-md ${buttonHoverColor} transition-colors`}
+        style={{ backgroundColor: buttonBgColor }}
       >
-        ← Back to Quotes
+        {buttonText}
       </button>
     </div>
   );

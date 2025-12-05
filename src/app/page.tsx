@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react'; // Import useEffect
+import { useSearchParams } from 'next/navigation'; // Import useSearchParams
 import QuoteStart from '@/components/QuoteStart';
 import Wizard from '@/components/Wizard';
 import IndividualDetailsForm from '@/components/IndividualDetailsForm';
@@ -17,20 +18,40 @@ import IndividualBenefitDetailsForm from '@/components/IndividualBenefitDetailsF
 import { useHeader } from '@/context/HeaderContext'; // Import useHeader
 
 export default function Home() {
-  const { setHeaderTitle, setShowHomeButton, showHomeButton } = useHeader(); // Use the header context
-  const [showIntroScreen, setShowIntroScreen] = useState(true);
+  const { setHeaderTitle, setShowHomeButton, showHomeButton } = useHeader();
+  const searchParams = useSearchParams();
+
+  // Initialize states based on URL params on first render
+  const [showIntroScreen, setShowIntroScreen] = useState(() => !searchParams.get('platform'));
   const [selectedQuoteType, setSelectedQuoteType] = useState<'individual' | 'group' | null>(null);
-  const [showingExistingQuotes, setShowingExistingQuotes] = useState(false);
-  const [showCustomerServicePlatform, setShowCustomerServicePlatform] = useState(false);
-  const [showBenefitDesignerPlatform, setShowBenefitDesignerPlatform] = useState(false); // New state
-  const [showCreateGroupBenefitWizard, setShowCreateGroupBenefitWizard] = useState(false); // New state
-  const [showCreateIndividualBenefitWizard, setShowCreateIndividualBenefitWizard] = useState(false); // New state
-  const [showViewBenefits, setShowViewBenefits] = useState(false); // New state
+  const [showingExistingQuotes, setShowingExistingQuotes] = useState(() => searchParams.get('platform') === 'quoting');
+  const [showCustomerServicePlatform, setShowCustomerServicePlatform] = useState(() => searchParams.get('platform') === 'customer-service');
+  const [showBenefitDesignerPlatform, setShowBenefitDesignerPlatform] = useState(() => searchParams.get('platform') === 'benefit-designer');
+  const [showCreateGroupBenefitWizard, setShowCreateGroupBenefitWizard] = useState(false);
+  const [showCreateIndividualBenefitWizard, setShowCreateIndividualBenefitWizard] = useState(false);
+  const [showViewBenefits, setShowViewBenefits] = useState(false);
 
   useEffect(() => {
-    // Effect to react to showHomeButton changes from DynamicHeader
-    if (!showHomeButton && !showIntroScreen) { // If home button is hidden by DynamicHeader and we are not already on intro screen
-      setShowIntroScreen(true); // Go back to intro screen
+    const platform = searchParams.get('platform');
+    if (platform === 'customer-service') {
+      setHeaderTitle("Apogee Insurance Customer Service");
+      setShowHomeButton(true);
+    } else if (platform === 'quoting') {
+      setHeaderTitle("Apogee Insurance Quoting");
+      setShowHomeButton(true);
+    } else if (platform === 'benefit-designer') {
+      setHeaderTitle("Apogee Insurance Benefit Designer");
+      setShowHomeButton(true);
+    } else {
+      setHeaderTitle("Apogee Insurance");
+      setShowHomeButton(false);
+    }
+  }, [searchParams, setHeaderTitle, setShowHomeButton]);
+
+  // This useEffect remains to handle when the DynamicHeader's Home button is clicked
+  useEffect(() => {
+    if (!showHomeButton && !showIntroScreen) {
+      setShowIntroScreen(true);
       setHeaderTitle("Apogee Insurance");
     }
   }, [showHomeButton, showIntroScreen, setHeaderTitle]);
