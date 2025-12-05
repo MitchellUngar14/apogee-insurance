@@ -6,11 +6,12 @@ import { eq } from 'drizzle-orm';
 
 export async function PATCH(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> } // Updated type signature
 ) {
+  let id: string = 'unknown'; // Declare and initialize id here
   try {
     const resolvedParams = await Promise.resolve(context.params); // Explicitly await context.params
-    const { id } = resolvedParams;
+    id = resolvedParams.id; // Assign to the outer-scoped id
     const applicantId = parseInt(id, 10);
 
     if (isNaN(applicantId)) {
@@ -46,7 +47,7 @@ export async function PATCH(
 
     return NextResponse.json(updatedApplicants[0], { status: 200 });
   } catch (error) {
-    console.error(`Error updating applicant ${context.params.id}:`, error);
+    console.error(`Error updating applicant ${id}:`, error);
     return NextResponse.json(
       { message: 'Internal Server Error', error: error },
       { status: 500 }

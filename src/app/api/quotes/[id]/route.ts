@@ -6,11 +6,12 @@ import { eq } from 'drizzle-orm';
 
 export async function GET(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> } // Updated type signature
 ) {
+  let id: string = 'unknown'; // Declare and initialize id here
   try {
     const resolvedParams = await Promise.resolve(context.params); // Explicitly await context.params
-    const { id } = resolvedParams;
+    id = resolvedParams.id; // Assign to the outer-scoped id
     const quoteId = parseInt(id, 10);
     if (isNaN(quoteId)) {
       return NextResponse.json({ message: 'Invalid Quote ID' }, { status: 400 });
@@ -69,7 +70,7 @@ export async function GET(
       { status: 200 }
     );
   } catch (error) {
-    console.error(`Error fetching quote ${params.id}:`, error);
+    console.error(`Error fetching quote ${id}:`, error); // Use 'id' here
     return NextResponse.json(
       { message: 'Internal Server Error', error: error }, // Log full error object
       { status: 500 }
@@ -79,11 +80,12 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> } // Updated type signature
 ) {
+  let id: string = 'unknown'; // Declare and initialize id here
   try {
     const resolvedParams = await Promise.resolve(context.params); // Explicitly await context.params
-    const { id } = resolvedParams;
+    id = resolvedParams.id; // Assign to the outer-scoped id
     const quoteId = parseInt(id, 10);
 
     if (isNaN(quoteId)) {
@@ -113,7 +115,7 @@ export async function PATCH(
 
     return NextResponse.json(updatedQuotes[0], { status: 200 });
   } catch (error) {
-    console.error(`Error updating quote ${context.params.id}:`, error);
+    console.error(`Error updating quote ${id}:`, error); // Use 'id' here
     return NextResponse.json(
       { message: 'Internal Server Error', error: error },
       { status: 500 }

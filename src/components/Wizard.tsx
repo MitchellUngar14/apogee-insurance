@@ -49,7 +49,7 @@ export default function Wizard({ steps, onComplete, initialData, onExitWizard, h
           initialData: formData, // Pass all accumulated form data to the current step
           isFirstStep: currentStepIndex === 0,
           isLastStep: currentStepIndex === steps.length - 1,
-        })
+        } as any) // Cast props to any here
     : currentStep.component;
 
 

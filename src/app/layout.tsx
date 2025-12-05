@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { HeaderProvider } from '@/context/HeaderContext'; // Import HeaderProvider
 import DynamicHeader from '@/components/DynamicHeader'; // Import DynamicHeader
+import { Suspense } from 'react'; // Import Suspense
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,11 @@ export default function RootLayout({
               <DynamicHeader /> {/* Use DynamicHeader component */}
             </div>
           </header>
-          <main className="container mx-auto p-4">{children}</main>
+          <main className="container mx-auto p-4">
+            <Suspense fallback={<div>Loading...</div>}>
+              {children}
+            </Suspense>
+          </main>
           <footer className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 p-4 text-center text-sm mt-8">
             <p>
               &copy; {new Date().getFullYear()} Mitchell Ungar. All Rights Reserved.

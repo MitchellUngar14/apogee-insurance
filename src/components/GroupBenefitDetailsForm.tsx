@@ -4,10 +4,10 @@
 import React from 'react';
 
 type GroupBenefitDetailsFormProps = {
-  onNext: (data: any) => void;
-  onPrevious: () => void;
-  isFirstStep: boolean;
-  isLastStep: boolean;
+  onNext?: (data: any) => void; // Made optional
+  onPrevious?: () => void; // Made optional
+  isFirstStep?: boolean; // Made optional
+  isLastStep?: boolean; // Made optional
   initialData?: any;
 };
 
@@ -21,7 +21,7 @@ export default function GroupBenefitDetailsForm({
   // Placeholder for form state and handlers
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onNext({ /* form data */ });
+    onNext?.({ /* form data */ }); // Use optional chaining
   };
 
   return (
@@ -35,7 +35,7 @@ export default function GroupBenefitDetailsForm({
       <div className="flex justify-between mt-6">
         <button
           type="button"
-          onClick={onPrevious}
+          onClick={onPrevious} // onPrevious is already optional, will be undefined if not passed.
           className="px-6 py-2 text-white rounded-md hover:bg-orange-600 transition-colors"
           style={{ backgroundColor: '#FFA500' }} // Vibrant orange
         >

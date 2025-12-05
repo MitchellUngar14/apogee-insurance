@@ -8,10 +8,10 @@ type GroupDetailsFormProps = {
     groupName: string;
     // Add more fields as needed for group details
   };
-  onNext: (data: any) => void;
-  onPrevious: () => void;
-  isFirstStep: boolean;
-  isLastStep: boolean;
+  onNext?: (data: any) => void; // Made optional
+  onPrevious?: () => void; // Made optional
+  isFirstStep?: boolean; // Made optional
+  isLastStep?: boolean; // Made optional
 };
 
 export default function GroupDetailsForm({
@@ -39,7 +39,7 @@ export default function GroupDetailsForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Add validation here
-    onNext(formData);
+    onNext?.(formData); // Use optional chaining
   };
 
   return (
@@ -62,7 +62,7 @@ export default function GroupDetailsForm({
       <div className="flex justify-between mt-6">
         <button
           type="button"
-          onClick={onPrevious}
+          onClick={onPrevious} // onPrevious is already optional, will be undefined if not passed.
           className="px-6 py-2 text-white rounded-md hover:bg-soft-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors
                      dark:bg-soft-blue-800 dark:text-soft-blue-100 dark:hover:bg-soft-blue-700"
           style={{ backgroundColor: '#22c55e' }}

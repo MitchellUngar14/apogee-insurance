@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react'; // Import useEffect
-import { useSearchParams, useRouter } from 'next/navigation'; // Import useSearchParams and useRouter
+import { useState, useEffect } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import QuoteStart from '@/components/QuoteStart';
 import Wizard from '@/components/Wizard';
 import IndividualDetailsForm from '@/components/IndividualDetailsForm';
@@ -9,18 +9,18 @@ import GroupDetailsForm from '@/components/GroupDetailsForm';
 import ViewQuotes from '@/components/ViewQuotes';
 import IntroHome from '@/components/IntroHome';
 import CustomerServicePlatform from '@/components/CustomerServicePlatform';
-import BenefitDesignerPlatform from '@/components/BenefitDesignerPlatform'; // Import new component
-import CreateGroupBenefitWizard from '@/components/CreateGroupBenefitWizard'; // New import
-import CreateIndividualBenefitWizard from '@/components/CreateIndividualBenefitWizard'; // New import
-import ViewBenefits from '@/components/ViewBenefits'; // New import
-import GroupBenefitDetailsForm from '@/components/GroupBenefitDetailsForm'; // New import
-import IndividualBenefitDetailsForm from '@/components/IndividualBenefitDetailsForm'; // New import
-import { useHeader } from '@/context/HeaderContext'; // Import useHeader
+import BenefitDesignerPlatform from '@/components/BenefitDesignerPlatform';
+import CreateGroupBenefitWizard from '@/components/CreateGroupBenefitWizard';
+import CreateIndividualBenefitWizard from '@/components/CreateIndividualBenefitWizard';
+import ViewBenefits from '@/components/ViewBenefits';
+import GroupBenefitDetailsForm from '@/components/GroupBenefitDetailsForm';
+import IndividualBenefitDetailsForm from '@/components/IndividualBenefitDetailsForm';
+import { useHeader } from '@/context/HeaderContext';
 
 export default function Home() {
   const { setHeaderTitle, setShowHomeButton, showHomeButton } = useHeader();
   const searchParams = useSearchParams();
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();
 
   // Initialize states based on URL params on first render
   const [showIntroScreen, setShowIntroScreen] = useState(() => !searchParams.get('platform'));
@@ -59,8 +59,8 @@ export default function Home() {
 
   const handleGoToQuotingPlatform = () => {
     setShowIntroScreen(false);
-    setShowCustomerServicePlatform(false); // Ensure other platforms are hidden
-    setShowBenefitDesignerPlatform(false); // Ensure other platforms are hidden
+    setShowCustomerServicePlatform(false);
+    setShowBenefitDesignerPlatform(false);
     setShowCreateGroupBenefitWizard(false);
     setShowCreateIndividualBenefitWizard(false);
     setShowViewBenefits(false);
@@ -68,12 +68,12 @@ export default function Home() {
     setShowHomeButton(true);
   };
 
-  const handleGoToCustomerServicePlatform = () => { // New handler
+  const handleGoToCustomerServicePlatform = () => {
     setShowIntroScreen(false);
-    setSelectedQuoteType(null); // Ensure other platforms are hidden
-    setShowingExistingQuotes(false); // Ensure other platforms are hidden
+    setSelectedQuoteType(null);
+    setShowingExistingQuotes(false);
     setShowCustomerServicePlatform(true);
-    setShowBenefitDesignerPlatform(false); // Ensure other platforms are hidden
+    setShowBenefitDesignerPlatform(false);
     setShowCreateGroupBenefitWizard(false);
     setShowCreateIndividualBenefitWizard(false);
     setShowViewBenefits(false);
@@ -81,11 +81,11 @@ export default function Home() {
     setShowHomeButton(true);
   };
 
-  const handleGoToBenefitDesignerPlatform = () => { // New handler
+  const handleGoToBenefitDesignerPlatform = () => {
     setShowIntroScreen(false);
-    setSelectedQuoteType(null); // Ensure other platforms are hidden
-    setShowingExistingQuotes(false); // Ensure other platforms are hidden
-    setShowCustomerServicePlatform(false); // Ensure other platforms are hidden
+    setSelectedQuoteType(null);
+    setShowingExistingQuotes(false);
+    setShowCustomerServicePlatform(false);
     setShowBenefitDesignerPlatform(true);
     setHeaderTitle("Apogee Insurance Benefit Designer");
     setShowHomeButton(true);
@@ -96,21 +96,21 @@ export default function Home() {
     setSelectedQuoteType(null);
     setShowingExistingQuotes(false);
     setShowCustomerServicePlatform(false);
-    setShowBenefitDesignerPlatform(false); // Reset new state
+    setShowBenefitDesignerPlatform(false);
     setShowCreateGroupBenefitWizard(false);
     setShowCreateIndividualBenefitWizard(false);
     setShowViewBenefits(false);
     setHeaderTitle("Apogee Insurance");
     setShowHomeButton(false);
-    router.push('/'); // Navigate to base URL to clear query params
+    router.push('/');
   };
 
-  const handleBackToQuotingPlatformHome = () => { // Only stop showing existing quotes
+  const handleBackToQuotingPlatformHome = () => {
     setShowingExistingQuotes(false);
   };
 
-  const handleBackToQuoteStart = () => { // New handler for Wizard's onExitWizard
-    setSelectedQuoteType(null); // Stop showing the wizard and return to QuoteStart
+  const handleBackToQuoteStart = () => {
+    setSelectedQuoteType(null);
   };
 
   const handleBackToBenefitDesignerPlatformHome = () => {
@@ -162,13 +162,13 @@ export default function Home() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...data, quoteType: 'Individual' }), // Add quoteType
+        body: JSON.stringify({ ...data, quoteType: 'Individual' }),
       });
       if (response.ok) {
         const newApplicant = await response.json();
         console.log('Applicant saved successfully:', newApplicant);
         alert('Individual Quote submitted successfully!');
-        setSelectedQuoteType(null); // Reset wizard
+        setSelectedQuoteType(null);
       } else {
         const errorData = await response.json();
         console.error('Failed to save applicant:', errorData);
@@ -194,7 +194,7 @@ export default function Home() {
         const newGroup = await response.json();
         console.log('Group saved successfully:', newGroup);
         alert('Group Quote submitted successfully!');
-        setSelectedQuoteType(null); // Reset wizard
+        setSelectedQuoteType(null);
       } else {
         const errorData = await response.json();
         console.error('Failed to save group:', errorData);
@@ -212,7 +212,6 @@ export default function Home() {
       name: 'Personal Details',
       component: <IndividualDetailsForm />,
     },
-    // Add more steps for individual quote as needed
   ];
 
   const groupQuoteSteps = [
@@ -221,7 +220,6 @@ export default function Home() {
       name: 'Group Details',
       component: <GroupDetailsForm />,
     },
-    // Add more steps for group quote as needed
   ];
 
   // Placeholder steps for Benefit Designers
@@ -242,11 +240,11 @@ export default function Home() {
         <IntroHome
           onGoToQuotingPlatform={handleGoToQuotingPlatform}
           onGoToCustomerServicePlatform={handleGoToCustomerServicePlatform}
-          onGoToBenefitDesignerPlatform={handleGoToBenefitDesignerPlatform} // Pass new handler
+          onGoToBenefitDesignerPlatform={handleGoToBenefitDesignerPlatform}
         />
-      ) : showCustomerServicePlatform ? ( // New conditional render
+      ) : showCustomerServicePlatform ? (
         <CustomerServicePlatform onBack={handleBackToIntro} />
-      ) : showBenefitDesignerPlatform ? ( // New conditional render
+      ) : showBenefitDesignerPlatform ? (
         showCreateGroupBenefitWizard ? (
           <Wizard
             steps={groupBenefitSteps}

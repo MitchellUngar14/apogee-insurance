@@ -12,10 +12,10 @@ type IndividualDetailsFormProps = {
     phoneNumber?: string;
     email: string;
   };
-  onNext: (data: any) => void;
-  onPrevious: () => void;
-  isFirstStep: boolean;
-  isLastStep: boolean;
+  onNext?: (data: any) => void; // Made optional
+  onPrevious?: () => void; // Made optional
+  isFirstStep?: boolean; // Made optional
+  isLastStep?: boolean; // Made optional
 };
 
 export default function IndividualDetailsForm({
@@ -58,7 +58,7 @@ export default function IndividualDetailsForm({
       return;
     }
     // TODO: Add more robust validation, e.g., email format, date format, phone format
-    onNext(formData);
+    onNext?.(formData); // Use optional chaining
   };
 
   return (
