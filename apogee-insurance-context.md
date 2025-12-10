@@ -1,3 +1,19 @@
+# Apogee Insurance Platform
+
+## Live Deployments
+
+| Service | URL |
+|---------|-----|
+| Quoting Service | https://apogee-insurance-quoting.vercel.app |
+| Customer Service | https://apogee-insurance-customer-service.vercel.app |
+| Benefit Designer | https://apogee-insurance-benefit-designer.vercel.app |
+
+**GitHub:** https://github.com/MitchellUngar14/apogee-insurance
+
+---
+
+## Original Project Plan
+
 **The Tribunal:** Of course. As the General Project Manager, I have synthesized the insights from our specialist team to formulate a cohesive and actionable plan for developing your insurance quoting platform.
 
 Here is the comprehensive project plan:
