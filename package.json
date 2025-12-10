@@ -1,15 +1,26 @@
 {
-  "name": "apogee-insurance",
+  "name": "apogee-insurance-monorepo",
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "drizzle-kit generate",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "dev:quoting": "npm run dev -w packages/quoting-service",
+    "dev:customer": "npm run dev -w packages/customer-service",
+    "dev:designer": "npm run dev -w packages/benefit-designer-service",
+    "dev:all": "concurrently \"npm run dev:quoting\" \"npm run dev:customer\" \"npm run dev:designer\"",
+    "build:quoting": "npm run build -w packages/quoting-service",
+    "build:customer": "npm run build -w packages/customer-service",
+    "build:designer": "npm run build -w packages/benefit-designer-service",
+    "build:all": "npm run build:quoting && npm run build:customer && npm run build:designer"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.0.2",
@@ -24,7 +35,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "dotenv": "^17.2.3",
+    "concurrently": "^9.2.1",
+
     "drizzle-kit": "^0.31.8",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",

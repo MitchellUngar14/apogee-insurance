@@ -1,6 +1,6 @@
 // src/app/api/applicants/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db } from '@/lib/db/quoting';
 import { applicants, quotes } from '@/lib/schema'; // Ensure quotes is imported for quote creation
 import { eq } from 'drizzle-orm';
 

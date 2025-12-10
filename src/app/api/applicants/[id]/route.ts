@@ -1,6 +1,6 @@
 // src/app/api/applicants/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db } from '@/lib/db/quoting';
 import { applicants } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
 

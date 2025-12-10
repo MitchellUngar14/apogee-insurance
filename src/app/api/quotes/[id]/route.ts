@@ -1,6 +1,6 @@
 // src/app/api/quotes/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db } from '@/lib/db/quoting';
 import { quotes, applicants, groups, coverages } from '@/lib/schema';
 import { eq } from 'drizzle-orm';
 

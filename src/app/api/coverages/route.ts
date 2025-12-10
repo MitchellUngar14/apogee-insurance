@@ -1,6 +1,6 @@
 // src/app/api/coverages/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db } from '@/lib/db/quoting';
 import { coverages } from '@/lib/schema';
 
 export async function GET() {
