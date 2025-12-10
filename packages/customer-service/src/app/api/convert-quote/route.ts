@@ -1,6 +1,6 @@
 // Convert a quote to a policy (Individual or Group)
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db } from '../../../lib/db';
 import {
   individualPolicies,
   policyHolders,
@@ -9,8 +9,8 @@ import {
   policyClasses,
   groupMembers,
   classCoverages,
-} from '@/lib/schema';
-import { fetchQuoteDetail, archiveQuote } from '@/lib/quotingClient';
+} from '../../../lib/schema';
+import { fetchQuoteDetail, archiveQuote } from '../../../lib/quotingClient';
 import { generatePolicyNumber } from '@apogee/shared';
 
 export async function POST(req: Request) {
@@ -132,6 +132,9 @@ async function convertIndividualQuote({
 
   // Create policy holder from applicant
   if (quoteDetail.applicant) {
+    if (!quoteDetail.applicant.email) {
+      throw new Error('Applicant email is required to create a policy holder');
+    }
     await db.insert(policyHolders).values({
       policyId,
       firstName: quoteDetail.applicant.firstName,
@@ -232,7 +235,7 @@ async function convertGroupQuote({
           firstName: applicant.firstName,
           middleName: applicant.middleName,
           lastName: applicant.lastName,
-          email: applicant.email,
+          email: applicant.email || "",
           birthdate: applicant.birthdate ? new Date(applicant.birthdate) : null,
           phoneNumber: applicant.phoneNumber,
           sourceApplicantId: applicant.id,

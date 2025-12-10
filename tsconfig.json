@@ -37,6 +37,7 @@
     "**/*.mts"
   ],
   "exclude": [
+    "packages",
     "node_modules"
   ]
 }

@@ -1,7 +1,7 @@
 // Individual Policies API
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { individualPolicies, policyHolders, individualPolicyCoverages } from '@/lib/schema';
+import { db } from '../../../lib/db';
+import { individualPolicies, policyHolders, individualPolicyCoverages } from '../../../lib/schema';
 
 export async function GET() {
   try {

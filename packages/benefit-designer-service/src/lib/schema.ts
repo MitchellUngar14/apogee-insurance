@@ -54,6 +54,18 @@ export const planBenefits = pgTable('plan_benefits', {
   isIncluded: boolean('is_included').default(true).notNull(),
 });
 
+// Product Configurations Table: Stores different product configurations for benefit plans.
+export const productConfigurations = pgTable('product_configurations', {
+  id: serial('id').primaryKey(),
+  benefitPlanId: integer('benefit_plan_id').references(() => plans.id).notNull(),
+  productType: varchar('product_type', { length: 100 }).notNull(),
+  configDetails: text('config_details'),
+  premiumBase: integer('premium_base'),
+  deductible: integer('deductible'),
+  copay: integer('copay'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 
 // --- Relations ---
 

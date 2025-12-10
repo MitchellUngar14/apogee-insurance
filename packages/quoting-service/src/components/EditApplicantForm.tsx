@@ -8,7 +8,7 @@ import {
   getStatesProvinces,
   validatePostalCode,
   formatPostalCode,
-} from '@/lib/addressData';
+} from '../lib/addressData';
 
 interface Applicant {
   id: number;

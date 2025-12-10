@@ -7,7 +7,7 @@ import EditApplicantForm from '@/components/EditApplicantForm';
 import EditGroupForm from '@/components/EditGroupForm';
 import EditGroupEmployeeForm from '@/components/EditGroupEmployeeForm';
 import { formatDateForDisplay } from '@apogee/shared';
-import { getCountryByCode } from '@/lib/addressData';
+import { getCountryByCode } from '../../../lib/addressData';
 
 interface Group {
   id: number;

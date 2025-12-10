@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { benefitPlans, productConfigurations } from '@/lib/schema';
+import { db } from '../../../lib/db';
+import { plans, productConfigurations } from '../../../lib/schema'; // Changed benefitPlans to plans
 
 export async function GET() {
   try {
-    const allPlans = await db.select().from(benefitPlans);
+    const allPlans = await db.select().from(plans); // Changed benefitPlans to plans
     return NextResponse.json(allPlans, { status: 200 });
   } catch (error) {
     console.error('Error fetching benefit plans:', error);
@@ -18,22 +18,20 @@ export async function GET() {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { planName, planType, description, products } = body;
+    const { planName, products } = body;
 
-    if (!planName || !planType) {
+    if (!planName) {
       return NextResponse.json(
-        { message: 'Plan name and type are required' },
+        { message: 'Plan name is required' },
         { status: 400 }
       );
     }
 
     // Create the benefit plan
     const newPlan = await db
-      .insert(benefitPlans)
+      .insert(plans) // Changed benefitPlans to plans
       .values({
         planName,
-        planType,
-        description,
         status: 'Draft',
       })
       .returning();

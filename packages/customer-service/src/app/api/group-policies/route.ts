@@ -1,7 +1,7 @@
 // Group Policies API
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { groupPolicies, policyClasses, groupMembers, classCoverages } from '@/lib/schema';
+import { db } from '../../../lib/db';
+import { groupPolicies, policyClasses, groupMembers, classCoverages } from '../../../lib/schema';
 
 export async function GET() {
   try {

@@ -7,7 +7,7 @@ import {
   getStatesProvinces,
   validatePostalCode,
   formatPostalCode,
-} from '@/lib/addressData';
+} from '../lib/addressData';
 
 type IndividualDetailsFormProps = {
   initialData?: {

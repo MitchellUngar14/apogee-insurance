@@ -1,7 +1,7 @@
 // Employee Class Detail API
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { employeeClasses, applicants } from '@/lib/schema';
+import { db } from '../../../../lib/db';
+import { employeeClasses, applicants } from '../../../../lib/schema';
 import { eq } from 'drizzle-orm';
 
 // GET single employee class with its members

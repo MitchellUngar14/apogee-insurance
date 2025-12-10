@@ -1,6 +1,6 @@
 // Proxy to Quoting Service for individual quote operations (read-only)
 import { NextResponse } from 'next/server';
-import { fetchQuoteDetail } from '@/lib/quotingClient';
+import { fetchQuoteDetail } from '../../../../lib/quotingClient';
 
 export async function GET(
   request: Request,

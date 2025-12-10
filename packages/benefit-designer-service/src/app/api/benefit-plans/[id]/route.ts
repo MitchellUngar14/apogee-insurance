@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
-import { benefitPlans, productConfigurations } from '@/lib/schema';
+import { db } from '../../../../lib/db';
+import { plans, productConfigurations } from '../../../../lib/schema'; // Changed benefitPlans to plans
 import { eq } from 'drizzle-orm';
 
 export async function GET(
@@ -19,8 +19,8 @@ export async function GET(
 
     const plan = await db
       .select()
-      .from(benefitPlans)
-      .where(eq(benefitPlans.id, planId))
+      .from(plans) // Changed benefitPlans to plans
+      .where(eq(plans.id, planId)) // Changed benefitPlans.id to plans.id
       .execute();
 
     if (!plan.length) {
@@ -65,22 +65,20 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { planName, status, description } = body;
+    const { planName, status } = body;
 
     const updateData: Record<string, any> = {};
     if (planName !== undefined) updateData.planName = planName;
     if (status !== undefined) updateData.status = status;
-    if (description !== undefined) updateData.description = description;
-    updateData.updatedAt = new Date();
 
-    if (Object.keys(updateData).length === 1) { // Only updatedAt
+    if (Object.keys(updateData).length === 0) { 
       return NextResponse.json({ message: 'No fields to update' }, { status: 400 });
     }
 
     const updatedPlans = await db
-      .update(benefitPlans)
+      .update(plans) // Changed benefitPlans to plans
       .set(updateData)
-      .where(eq(benefitPlans.id, planId))
+      .where(eq(plans.id, planId)) // Changed benefitPlans.id to plans.id
       .returning();
 
     if (!updatedPlans.length) {
@@ -118,8 +116,8 @@ export async function DELETE(
 
     // Delete the benefit plan
     const deletedPlans = await db
-      .delete(benefitPlans)
-      .where(eq(benefitPlans.id, planId))
+      .delete(plans) // Changed benefitPlans to plans
+      .where(eq(plans.id, planId)) // Changed benefitPlans.id to plans.id
       .returning();
 
     if (!deletedPlans.length) {

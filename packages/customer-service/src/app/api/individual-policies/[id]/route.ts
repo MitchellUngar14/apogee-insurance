@@ -1,6 +1,6 @@
 // Individual Policy Detail API
 import { NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { db } from '../../../../lib/db';
 import {
   individualPolicies,
   policyHolders,
@@ -8,7 +8,7 @@ import {
   dependents,
   dependentCoverages,
   beneficiaries,
-} from '@/lib/schema';
+} from '../../../../lib/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET(

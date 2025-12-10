@@ -1,5 +1,10 @@
 // HTTP Client for communicating with Customer Service
-import type { Customer } from '@apogee/shared';
+// Customer type - represents a customer from Customer Service
+interface Customer {
+  id: number;
+  name: string;
+  email: string;
+}
 
 const CUSTOMER_SERVICE_URL = process.env.CUSTOMER_SERVICE_URL || 'http://localhost:3002';
 const INTERNAL_SERVICE_KEY = process.env.INTERNAL_SERVICE_KEY || 'dev-secret-key';
