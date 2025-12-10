@@ -7,3 +7,4 @@ export * from './policy';
 export * from './benefit';
 export * from './employee-class';
 export * from './api-contracts';
+export * from './auth';

@@ -1,20 +1,26 @@
 // src/components/DynamicHeader.tsx
 'use client';
 
-import React, { useMemo, useState, useEffect } from 'react'; // Import useState and useEffect
+import React, { useMemo, useState, useEffect } from 'react';
 import { useHeader } from '@/context/HeaderContext';
 import { useRouter } from 'next/navigation';
-import SettingsModal from '@/components/SettingsModal'; // Import SettingsModal
+import { useSession, signOut } from 'next-auth/react';
+import SettingsModal from '@/components/SettingsModal';
 
 export default function DynamicHeader() {
   const { headerTitle, showHomeButton, setShowHomeButton, setHeaderTitle } = useHeader();
   const router = useRouter();
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false); // State for modal visibility
+  const { data: session } = useSession();
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
   const handleGoHome = () => {
     setHeaderTitle("Apogee Insurance");
     setShowHomeButton(false);
-    router.push('/'); // Navigate to base URL to clear query params
+    router.push('/');
+  };
+
+  const handleSignOut = async () => {
+    await signOut({ redirect: true, callbackUrl: '/auth/signin' });
   };
 
   const toggleDarkMode = () => {
@@ -29,20 +35,17 @@ export default function DynamicHeader() {
   };
 
   useEffect(() => {
-    // Apply theme from localStorage on initial load
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
     } else if (savedTheme === 'light') {
       document.documentElement.classList.remove('dark');
     } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      // If no theme saved, use system preference
       document.documentElement.classList.add('dark');
     }
   }, []);
 
   const renderHeaderTitle = useMemo(() => {
-    // If headerTitle is already a ReactNode (e.g., set directly with JSX), render as is
     if (typeof headerTitle !== 'string') return headerTitle;
 
     const parts = headerTitle.split(/(Quoting|Customer Service|Benefit Designer)/g);
@@ -60,7 +63,6 @@ export default function DynamicHeader() {
     });
   }, [headerTitle]);
 
-
   return (
     <>
       <div className="flex items-center justify-between w-full relative">
@@ -70,19 +72,34 @@ export default function DynamicHeader() {
             className="px-4 py-2 text-white text-sm rounded-md hover:bg-soft-green-600 transition-colors"
             style={{ backgroundColor: '#22c55e' }}
           >
-            🏠 Home
+            Home
           </button>
         )}
         <h1 className="text-2xl font-bold flex-grow text-center">
           {renderHeaderTitle}
         </h1>
-        <button
-          onClick={() => setIsSettingsModalOpen(true)} // Open settings modal
-          className="ml-auto p-2 text-white rounded-md hover:bg-soft-blue-600 transition-colors"
-          style={{ backgroundColor: '#0284c7' }}
-        >
-          ⚙️
-        </button>
+        <div className="flex items-center gap-2">
+          {session?.user && (
+            <>
+              <span className="text-sm text-white/80 hidden sm:inline">
+                {session.user.email}
+              </span>
+              <button
+                onClick={handleSignOut}
+                className="px-3 py-1 text-sm text-white rounded-md hover:bg-red-600 transition-colors bg-red-500"
+              >
+                Sign Out
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => setIsSettingsModalOpen(true)}
+            className="p-2 text-white rounded-md hover:bg-soft-blue-600 transition-colors"
+            style={{ backgroundColor: '#0284c7' }}
+          >
+            ⚙️
+          </button>
+        </div>
       </div>
       <SettingsModal
         isOpen={isSettingsModalOpen}
