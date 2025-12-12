@@ -117,11 +117,12 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { status, expirationDate } = body;
+    const { status, effectiveDate, expirationDate } = body;
 
     const updateData: Record<string, any> = {};
     if (status !== undefined) updateData.status = status;
-    if (expirationDate !== undefined) updateData.expirationDate = new Date(expirationDate);
+    if (effectiveDate !== undefined) updateData.effectiveDate = new Date(effectiveDate);
+    if (expirationDate !== undefined) updateData.expirationDate = expirationDate ? new Date(expirationDate) : null;
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ message: 'No fields to update' }, { status: 400 });
