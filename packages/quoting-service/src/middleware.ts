@@ -20,6 +20,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Allow internal service-to-service communication via service key
+  const serviceKey = request.headers.get('X-Service-Key');
+  const internalServiceKey = process.env.INTERNAL_SERVICE_KEY;
+  if (internalServiceKey && serviceKey === internalServiceKey && pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   // Get token from query param, cookie, or Authorization header
   const tokenFromQuery = request.nextUrl.searchParams.get('token');
   const tokenFromCookie = request.cookies.get('service_token')?.value;
