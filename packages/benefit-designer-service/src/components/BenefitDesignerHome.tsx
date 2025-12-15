@@ -1,6 +1,6 @@
 'use client';
 
-const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL;
+const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL || '/';
 
 type BenefitDesignerHomeProps = {
   onCreateBenefit: () => void;

@@ -8,7 +8,7 @@ export default function DynamicHeader() {
   const { headerTitle, showHomeButton, setShowHomeButton, setHeaderTitle } = useHeader();
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
-  const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL;
+  const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL || '/';
 
   const handleGoHome = () => {
     setHeaderTitle("Apogee Quoting");
