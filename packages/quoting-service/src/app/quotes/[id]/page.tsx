@@ -6,6 +6,9 @@ import EditQuoteForm from '@/components/EditQuoteForm';
 import EditApplicantForm from '@/components/EditApplicantForm';
 import EditGroupForm from '@/components/EditGroupForm';
 import EditGroupEmployeeForm from '@/components/EditGroupEmployeeForm';
+import ViewQuoteBenefits, { QuoteBenefit } from '@/components/ViewQuoteBenefits';
+import EditBenefitForm from '@/components/EditBenefitForm';
+import AddBenefitFlow from '@/components/AddBenefitFlow';
 import { formatDateForDisplay } from '@apogee/shared';
 import { getCountryByCode } from '../../../lib/addressData';
 
@@ -66,6 +69,7 @@ interface QuoteDetails {
   group: Group | null;
   groupApplicants: Applicant[];
   coverages: Coverage[];
+  quoteBenefits: QuoteBenefit[];
 }
 
 export default function QuoteDetailPage() {
@@ -81,6 +85,8 @@ export default function QuoteDetailPage() {
   const [editingApplicant, setEditingApplicant] = useState(false);
   const [editingGroup, setEditingGroup] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Applicant | null>(null);
+  const [editingBenefit, setEditingBenefit] = useState<QuoteBenefit | null>(null);
+  const [addingBenefit, setAddingBenefit] = useState(false);
   const [expandedClasses, setExpandedClasses] = useState<Set<number | null>>(new Set());
 
   async function fetchQuoteDetails() {
@@ -218,6 +224,80 @@ export default function QuoteDetailPage() {
     }
   };
 
+  const handleSaveBenefit = async (benefitId: number, configuredValues: Record<string, unknown>) => {
+    try {
+      const response = await fetch(`/api/quote-benefits/${benefitId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ configuredValues }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save benefit changes.');
+      }
+
+      setEditingBenefit(null);
+      fetchQuoteDetails();
+    } catch (err) {
+      console.error('Error saving benefit:', err);
+      alert((err as Error).message);
+    }
+  };
+
+  const handleDeleteBenefit = async (benefitId: number) => {
+    try {
+      const response = await fetch(`/api/quote-benefits/${benefitId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete benefit.');
+      }
+
+      fetchQuoteDetails();
+    } catch (err) {
+      console.error('Error deleting benefit:', err);
+      alert((err as Error).message);
+    }
+  };
+
+  const handleAddBenefit = async (benefit: {
+    templateDbId: number;
+    templateUuid: string;
+    templateName: string;
+    templateVersion: string;
+    categoryName: string;
+    categoryIcon: string | null;
+    fieldSchema: { fields: unknown[] };
+    configuredValues: Record<string, unknown>;
+    instanceNumber: number;
+  }) => {
+    try {
+      const response = await fetch('/api/quote-benefits', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          quoteId: Number(quoteId),
+          ...benefit,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add benefit.');
+      }
+
+      setAddingBenefit(false);
+      fetchQuoteDetails();
+    } catch (err) {
+      console.error('Error adding benefit:', err);
+      alert((err as Error).message);
+    }
+  };
+
   // Helper function to get class name for an employee
   const getClassName = (classId: number | null | undefined): string => {
     if (!classId) return 'Unassigned';
@@ -308,7 +388,7 @@ export default function QuoteDetailPage() {
     return <div className="text-center text-lg mt-8 form-label">Quote not found.</div>;
   }
 
-  const { quote, applicant, group, groupApplicants, coverages } = quoteDetails;
+  const { quote, applicant, group, groupApplicants, coverages, quoteBenefits } = quoteDetails;
 
   if (editingQuote && quote) {
     return (
@@ -347,6 +427,27 @@ export default function QuoteDetailPage() {
         employeeClasses={employeeClasses}
         onSave={handleSaveEmployee}
         onCancel={() => setEditingEmployee(null)}
+      />
+    );
+  }
+
+  if (editingBenefit) {
+    return (
+      <EditBenefitForm
+        benefit={editingBenefit}
+        onSave={handleSaveBenefit}
+        onCancel={() => setEditingBenefit(null)}
+      />
+    );
+  }
+
+  if (addingBenefit) {
+    return (
+      <AddBenefitFlow
+        quoteId={Number(quoteId)}
+        existingBenefits={quoteBenefits || []}
+        onSave={handleAddBenefit}
+        onCancel={() => setAddingBenefit(false)}
       />
     );
   }
@@ -494,6 +595,29 @@ export default function QuoteDetailPage() {
         <div className="mb-6">
           <h3 className="text-xl font-semibold form-label">Group Employees</h3>
           <p className="form-label">No employees added to this group yet.</p>
+        </div>
+      )}
+
+      {/* Benefits Section for Individual Quotes */}
+      {quote.type === 'Individual' && (
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-xl font-semibold form-label">
+              Configured Benefits ({quoteBenefits?.length || 0})
+            </h3>
+            <button
+              onClick={() => setAddingBenefit(true)}
+              className="px-4 py-2 text-white rounded-md hover:bg-green-600 transition-colors"
+              style={{ backgroundColor: '#22c55e' }}
+            >
+              + Add Benefit
+            </button>
+          </div>
+          <ViewQuoteBenefits
+            benefits={quoteBenefits || []}
+            onEditBenefit={(benefit) => setEditingBenefit(benefit)}
+            onDeleteBenefit={handleDeleteBenefit}
+          />
         </div>
       )}
 

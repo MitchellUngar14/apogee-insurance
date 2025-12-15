@@ -7,6 +7,7 @@ import {
   timestamp,
   pgEnum,
   integer,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -85,6 +86,30 @@ export const coverages = pgTable('coverages', {
   details: text('details'),
 });
 
+// Quote Benefits Table: Stores configured benefits from benefit templates for a quote.
+export const quoteBenefits = pgTable('quote_benefits', {
+  id: serial('id').primaryKey(),
+  quoteId: integer('quote_id')
+    .references(() => quotes.id)
+    .notNull(),
+  // Template snapshot (immutable at time of quote creation)
+  templateDbId: integer('template_db_id').notNull(),
+  templateUuid: varchar('template_uuid', { length: 36 }).notNull(),
+  templateName: varchar('template_name', { length: 256 }).notNull(),
+  templateVersion: varchar('template_version', { length: 20 }).notNull(),
+  categoryName: varchar('category_name', { length: 100 }).notNull(),
+  categoryIcon: varchar('category_icon', { length: 50 }),
+  // Schema snapshot - frozen at time of benefit configuration
+  fieldSchema: jsonb('field_schema').notNull(),
+  // User-entered values
+  configuredValues: jsonb('configured_values').notNull().default({}),
+  // Instance tracking (allows multiple instances of same template)
+  instanceNumber: integer('instance_number').notNull().default(1),
+  // Timestamps
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+});
+
 // --- Relations ---
 
 export const groupRelations = relations(groups, ({ many }) => ({
@@ -123,11 +148,19 @@ export const quoteRelations = relations(quotes, ({ one, many }) => ({
     references: [groups.id],
   }),
   coverages: many(coverages),
+  quoteBenefits: many(quoteBenefits),
 }));
 
 export const coverageRelations = relations(coverages, ({ one }) => ({
   quote: one(quotes, {
     fields: [coverages.quoteId],
+    references: [quotes.id],
+  }),
+}));
+
+export const quoteBenefitRelations = relations(quoteBenefits, ({ one }) => ({
+  quote: one(quotes, {
+    fields: [quoteBenefits.quoteId],
     references: [quotes.id],
   }),
 }));

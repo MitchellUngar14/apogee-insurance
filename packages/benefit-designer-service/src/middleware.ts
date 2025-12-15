@@ -10,11 +10,13 @@ const PORTAL_URL = process.env.PORTAL_URL;
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip auth for static files, health checks, and seed endpoint
+  // Skip auth for static files, health checks, seed endpoint, and templates API (for internal service calls)
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/health') ||
     pathname.startsWith('/api/seed') ||
+    pathname.startsWith('/api/templates') ||
+    pathname.startsWith('/api/categories') ||
     pathname === '/favicon.ico' ||
     pathname === '/unauthorized'
   ) {

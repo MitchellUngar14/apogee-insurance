@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '../../../../lib/db';
-import { quotes, applicants, groups, coverages, employeeClasses } from '../../../../lib/schema';
+import { quotes, applicants, groups, coverages, employeeClasses, quoteBenefits } from '../../../../lib/schema';
 import { eq } from 'drizzle-orm';
 
 export async function GET(
@@ -63,6 +63,13 @@ export async function GET(
       .where(eq(coverages.quoteId, quoteId))
       .execute();
 
+    // Fetch quote benefits
+    const relatedBenefits = await db
+      .select()
+      .from(quoteBenefits)
+      .where(eq(quoteBenefits.quoteId, quoteId))
+      .execute();
+
     return NextResponse.json(
       {
         quote: quote[0],
@@ -71,6 +78,7 @@ export async function GET(
         groupApplicants: quote[0].groupId ? relatedApplicants : [],
         employeeClasses: relatedEmployeeClasses,
         coverages: relatedCoverages,
+        quoteBenefits: relatedBenefits,
       },
       { status: 200 }
     );
@@ -155,6 +163,9 @@ export async function DELETE(
 
     // Delete coverages associated with this quote
     await db.delete(coverages).where(eq(coverages.quoteId, quoteId));
+
+    // Delete quote benefits associated with this quote
+    await db.delete(quoteBenefits).where(eq(quoteBenefits.quoteId, quoteId));
 
     // For Individual quotes, delete the applicant
     if (quote[0].applicantId) {

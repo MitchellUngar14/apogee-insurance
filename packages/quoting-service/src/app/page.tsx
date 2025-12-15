@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import QuoteStart from '@/components/QuoteStart';
 import Wizard from '@/components/Wizard';
-import IndividualDetailsForm from '@/components/IndividualDetailsForm';
+import IndividualQuoteWizard from '@/components/IndividualQuoteWizard';
 import GroupDetailsForm from '@/components/GroupDetailsForm';
 import GroupClassesForm from '@/components/GroupClassesForm';
 import GroupEmployeesForm from '@/components/GroupEmployeesForm';
 import ViewQuotes from '@/components/ViewQuotes';
 import { useHeader } from '@/context/HeaderContext';
+import type { ConfiguredBenefit } from '@/components/BenefitSelectionStep';
 
 export default function Home() {
   const { setHeaderTitle, setShowHomeButton } = useHeader();
@@ -34,26 +35,65 @@ export default function Home() {
     setSelectedQuoteType(type);
   };
 
-  const handleCompleteIndividualQuote = async (data: any) => {
+  const handleCompleteIndividualQuote = async (data: {
+    personalDetails: Record<string, unknown>;
+    configuredBenefits: ConfiguredBenefit[];
+  }) => {
     console.log('Individual Quote Completed:', data);
     try {
+      // Step 1: Create applicant and quote
       const response = await fetch('/api/applicants', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ ...data, quoteType: 'Individual' }),
+        body: JSON.stringify({ ...data.personalDetails, quoteType: 'Individual' }),
       });
-      if (response.ok) {
-        const newApplicant = await response.json();
-        console.log('Applicant saved successfully:', newApplicant);
-        alert('Individual Quote submitted successfully!');
-        setSelectedQuoteType(null);
-      } else {
+
+      if (!response.ok) {
         const errorData = await response.json();
         console.error('Failed to save applicant:', errorData);
         alert('Failed to submit individual quote. Please try again.');
+        return;
       }
+
+      const { applicant, quote } = await response.json();
+      console.log('Applicant saved successfully:', applicant);
+      console.log('Quote created:', quote);
+
+      // Step 2: Save configured benefits
+      if (data.configuredBenefits && data.configuredBenefits.length > 0) {
+        for (const benefit of data.configuredBenefits) {
+          const benefitResponse = await fetch('/api/quote-benefits', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              quoteId: quote.id,
+              templateDbId: benefit.template.id,
+              templateUuid: benefit.template.templateId,
+              templateName: benefit.template.name,
+              templateVersion: benefit.template.version,
+              categoryName: benefit.template.categoryName,
+              categoryIcon: benefit.template.categoryIcon,
+              fieldSchema: benefit.template.fieldSchema,
+              configuredValues: benefit.configuredValues,
+              instanceNumber: benefit.instanceNumber,
+            }),
+          });
+
+          if (!benefitResponse.ok) {
+            console.error('Failed to save benefit:', benefit.template.name);
+          } else {
+            const savedBenefit = await benefitResponse.json();
+            console.log('Benefit saved:', savedBenefit);
+          }
+        }
+      }
+
+      alert('Individual Quote submitted successfully!');
+      setSelectedQuoteType(null);
     } catch (error) {
       console.error('Error submitting individual quote:', error);
       alert('An error occurred while submitting the individual quote.');
@@ -148,14 +188,6 @@ export default function Home() {
     }
   };
 
-  const individualQuoteSteps = [
-    {
-      id: 'personalDetails',
-      name: 'Personal Details',
-      component: <IndividualDetailsForm />,
-    },
-  ];
-
   const groupQuoteSteps = [
     {
       id: 'groupDetails',
@@ -186,8 +218,7 @@ export default function Home() {
           <ViewQuotes onBack={handleBackToQuoteStart} />
         )
       ) : selectedQuoteType === 'individual' ? (
-        <Wizard
-          steps={individualQuoteSteps}
+        <IndividualQuoteWizard
           onComplete={handleCompleteIndividualQuote}
           onExitWizard={handleBackToQuoteStart}
         />
