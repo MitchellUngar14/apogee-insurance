@@ -1,5 +1,7 @@
 'use client';
 
+const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL;
+
 type QuoteStartProps = {
   onSelectQuoteType: (type: 'individual' | 'group') => void;
   onViewExistingQuotes: () => void;
@@ -29,11 +31,18 @@ export default function QuoteStart({ onSelectQuoteType, onViewExistingQuotes }: 
       </div>
       <button
         onClick={onViewExistingQuotes}
-        className="px-6 py-2 text-white rounded-md hover:bg-soft-green-600 transition-colors"
+        className="px-6 py-2 text-white rounded-md hover:bg-soft-green-600 transition-colors mb-6"
         style={{ backgroundColor: '#22c55e' }}
       >
         View Existing Quotes
       </button>
+      <a
+        href={PORTAL_URL}
+        className="px-6 py-2 text-white rounded-md hover:bg-soft-green-600 transition-colors"
+        style={{ backgroundColor: '#22c55e' }}
+      >
+        &larr; Back to Apogee Insurance
+      </a>
     </div>
   );
 }

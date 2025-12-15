@@ -8,82 +8,138 @@ import {
   integer,
   boolean,
   pgEnum,
+  uuid,
+  jsonb,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
-// Enum for Plan Status
-export const planStatusEnum = pgEnum('plan_status', [
-  'Draft',
-  'Active',
-  'Archived',
+// --- Enums ---
+
+// Enum for Template Status
+export const templateStatusEnum = pgEnum('template_status', [
+  'draft',
+  'active',
+  'archived',
 ]);
 
-// Enum for Benefit Category
-export const benefitCategoryEnum = pgEnum('benefit_category', [
-    'Medical',
-    'Dental',
-    'Vision',
-    'Life',
-    'Disability',
+// Enum for Benefit Type (Group vs Individual)
+export const benefitTypeEnum = pgEnum('benefit_type', [
+  'group',
+  'individual',
 ]);
 
 // --- Tables ---
 
-// Plans Table: Stores the overall benefit plan structure.
-export const plans = pgTable('plans', {
+// Benefit Categories Table: Stores categories like Health, Dental, Life, Auto, etc.
+export const benefitCategories = pgTable('benefit_categories', {
   id: serial('id').primaryKey(),
-  planName: varchar('plan_name', { length: 256 }).notNull(),
-  status: planStatusEnum('status').default('Draft').notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-// Benefit Options Table: Stores different options for benefits.
-export const benefitOptions = pgTable('benefit_options', {
-  id: serial('id').primaryKey(),
-  optionName: varchar('option_name', { length: 256 }).notNull(),
+  name: varchar('name', { length: 100 }).notNull().unique(),
   description: text('description'),
-  category: benefitCategoryEnum('category').notNull(),
+  icon: varchar('icon', { length: 50 }), // For UI display (e.g., emoji or icon name)
+  appliesTo: jsonb('applies_to').notNull().default(['group', 'individual']), // Array of benefit types
+  isActive: boolean('is_active').default(true).notNull(),
+  displayOrder: integer('display_order').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });
 
-// Plan Benefits Table: A join table to associate benefits with plans.
-export const planBenefits = pgTable('plan_benefits', {
+// Benefit Templates Table: Versioned templates with dynamic field schema
+export const benefitTemplates = pgTable('benefit_templates', {
   id: serial('id').primaryKey(),
-  planId: integer('plan_id').references(() => plans.id).notNull(),
-  benefitOptionId: integer('benefit_option_id').references(() => benefitOptions.id).notNull(),
-  isIncluded: boolean('is_included').default(true).notNull(),
-});
+  templateId: uuid('template_id').notNull(), // Groups all versions together
+  categoryId: integer('category_id').references(() => benefitCategories.id).notNull(),
+  type: benefitTypeEnum('type').notNull(), // 'group' or 'individual'
+  name: varchar('name', { length: 256 }).notNull(),
+  description: text('description'),
 
-// Product Configurations Table: Stores different product configurations for benefit plans.
-export const productConfigurations = pgTable('product_configurations', {
-  id: serial('id').primaryKey(),
-  benefitPlanId: integer('benefit_plan_id').references(() => plans.id).notNull(),
-  productType: varchar('product_type', { length: 100 }).notNull(),
-  configDetails: text('config_details'),
-  premiumBase: integer('premium_base'),
-  deductible: integer('deductible'),
-  copay: integer('copay'),
+  // Versioning
+  version: varchar('version', { length: 20 }).notNull(), // "1.0", "1.1", "2.0"
+  majorVersion: integer('major_version').notNull().default(1),
+  minorVersion: integer('minor_version').notNull().default(0),
+
+  // Dynamic field schema stored as JSON
+  fieldSchema: jsonb('field_schema').notNull().default({ fields: [] }),
+  defaultValues: jsonb('default_values').default({}),
+
+  // Status
+  status: templateStatusEnum('status').default('draft').notNull(),
+
+  // Metadata
   createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+  createdBy: integer('created_by'), // FK to users table if needed later
 });
-
 
 // --- Relations ---
 
-export const planRelations = relations(plans, ({ many }) => ({
-  planBenefits: many(planBenefits),
+export const benefitCategoryRelations = relations(benefitCategories, ({ many }) => ({
+  templates: many(benefitTemplates),
 }));
 
-export const benefitOptionRelations = relations(benefitOptions, ({ many }) => ({
-    planBenefits: many(planBenefits),
+export const benefitTemplateRelations = relations(benefitTemplates, ({ one }) => ({
+  category: one(benefitCategories, {
+    fields: [benefitTemplates.categoryId],
+    references: [benefitCategories.id],
+  }),
 }));
 
-export const planBenefitRelations = relations(planBenefits, ({ one }) => ({
-  plan: one(plans, {
-    fields: [planBenefits.planId],
-    references: [plans.id],
-  }),
-  benefitOption: one(benefitOptions, {
-    fields: [planBenefits.benefitOptionId],
-    references: [benefitOptions.id],
-  }),
-}));
+// --- Type Definitions for JSON Fields ---
+
+// Field types supported in the schema
+export type FieldType =
+  | 'money'
+  | 'percentage'
+  | 'number'
+  | 'text'
+  | 'textarea'
+  | 'date'
+  | 'dropdown'
+  | 'checkbox';
+
+// Validation rules structure
+export interface FieldValidation {
+  min?: number;
+  max?: number;
+  decimals?: number;
+  minLength?: number;
+  maxLength?: number;
+  pattern?: string;
+  minDate?: string; // 'today' or ISO date
+  maxDate?: string;
+  lessThanField?: string;
+  greaterThanField?: string;
+  requiredIf?: {
+    field: string;
+    value: unknown;
+  };
+  message?: string;
+}
+
+// Dropdown option structure
+export interface DropdownOption {
+  value: string;
+  label: string;
+}
+
+// Individual field definition
+export interface FieldDefinition {
+  id: string;
+  name: string;
+  type: FieldType;
+  required: boolean;
+  description?: string;
+  placeholder?: string;
+  options?: DropdownOption[]; // For dropdown type
+  validation?: FieldValidation;
+}
+
+// Complete field schema structure
+export interface FieldSchema {
+  fields: FieldDefinition[];
+}
+
+// Type for the benefit_templates table insert/select
+export type BenefitCategory = typeof benefitCategories.$inferSelect;
+export type NewBenefitCategory = typeof benefitCategories.$inferInsert;
+export type BenefitTemplate = typeof benefitTemplates.$inferSelect;
+export type NewBenefitTemplate = typeof benefitTemplates.$inferInsert;

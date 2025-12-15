@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL || 'https://apogee-insurance.vercel.app';
+const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL;
 
 export default function UnauthorizedPage() {
   return (

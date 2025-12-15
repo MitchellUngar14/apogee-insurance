@@ -1,47 +1,50 @@
 'use client';
 
-const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL;
-
-type BenefitDesignerHomeProps = {
-  onCreateBenefit: () => void;
-  onViewBenefits: () => void;
+type BenefitTypeSelectorProps = {
+  onSelectType: (type: 'individual' | 'group') => void;
+  onBack: () => void;
 };
 
-export default function BenefitDesignerHome({
-  onCreateBenefit,
-  onViewBenefits,
-}: BenefitDesignerHomeProps) {
+export default function BenefitTypeSelector({
+  onSelectType,
+  onBack,
+}: BenefitTypeSelectorProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] py-2">
-      <h2 className="text-3xl font-semibold mb-8 form-label">
-        Benefit Designer Portal
+      <h2 className="text-3xl font-semibold mb-4 form-label">
+        Create Benefit Template
       </h2>
       <p className="text-lg mb-8 form-label text-center max-w-md">
-        Create and manage benefit templates for individual and group insurance products.
+        Select the type of benefit template you want to create.
       </p>
       <div className="flex space-x-6 mb-6">
         <button
-          onClick={onCreateBenefit}
+          onClick={() => onSelectType('group')}
           className="px-8 py-4 text-white text-lg font-medium rounded-lg shadow-md hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-75 transition duration-150 ease-in-out"
           style={{ backgroundColor: '#FFA500' }}
         >
-          Create Benefit Template
+          Group Benefit
         </button>
         <button
-          onClick={onViewBenefits}
+          onClick={() => onSelectType('individual')}
           className="px-8 py-4 text-white text-lg font-medium rounded-lg shadow-md hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-opacity-75 transition duration-150 ease-in-out"
           style={{ backgroundColor: '#FFA500' }}
         >
-          View Benefit Templates
+          Individual Benefit
         </button>
       </div>
-      <a
-        href={PORTAL_URL}
+      <p className="text-sm mb-6 form-label text-center max-w-lg text-gray-600 dark:text-gray-400">
+        <strong>Group Benefits:</strong> Extended Health, Dental, Vision, Life Insurance for employee groups.
+        <br />
+        <strong>Individual Benefits:</strong> Car Insurance, Home Insurance, Boat Insurance, and more.
+      </p>
+      <button
+        onClick={onBack}
         className="px-6 py-2 text-white rounded-md hover:opacity-80 transition-colors"
         style={{ backgroundColor: '#FFA500' }}
       >
-        &larr; Back to Apogee Insurance
-      </a>
+        &larr; Back
+      </button>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { jwtVerify } from 'jose';
 
 const SERVICE_NAME = 'customer-service';
 const ALLOWED_ROLES = ['CustomerService', 'Admin'];
-const PORTAL_URL = process.env.PORTAL_URL || 'https://apogee-insurance.vercel.app';
+const PORTAL_URL = process.env.PORTAL_URL;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

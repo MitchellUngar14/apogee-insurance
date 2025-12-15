@@ -66,31 +66,25 @@ export default function DynamicHeader() {
   return (
     <>
       <div className="flex items-center justify-between w-full relative">
-        {showHomeButton && (
-          <button
-            onClick={handleGoHome}
-            className="px-4 py-2 text-white text-sm rounded-md hover:bg-soft-green-600 transition-colors"
-            style={{ backgroundColor: '#22c55e' }}
-          >
-            Home
-          </button>
-        )}
-        <h1 className="text-2xl font-bold flex-grow text-center">
+        <div className="z-10">
+          {showHomeButton && (
+            <button
+              onClick={handleGoHome}
+              className="px-4 py-2 text-white text-sm rounded-md hover:bg-soft-green-600 transition-colors"
+              style={{ backgroundColor: '#22c55e' }}
+            >
+              Home
+            </button>
+          )}
+        </div>
+        <h1 className="text-2xl font-bold absolute left-1/2 transform -translate-x-1/2">
           {renderHeaderTitle}
         </h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 z-10">
           {session?.user && (
-            <>
-              <span className="text-sm text-white/80 hidden sm:inline">
-                {session.user.email}
-              </span>
-              <button
-                onClick={handleSignOut}
-                className="px-3 py-1 text-sm text-white rounded-md hover:bg-red-600 transition-colors bg-red-500"
-              >
-                Sign Out
-              </button>
-            </>
+            <span className="text-sm text-white/80 hidden sm:inline">
+              {session.user.email}
+            </span>
           )}
           <button
             onClick={() => setIsSettingsModalOpen(true)}
@@ -105,6 +99,7 @@ export default function DynamicHeader() {
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         toggleDarkMode={toggleDarkMode}
+        onSignOut={handleSignOut}
       />
     </>
   );

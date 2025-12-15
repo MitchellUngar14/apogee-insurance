@@ -5,15 +5,16 @@ import { jwtVerify } from 'jose';
 
 const SERVICE_NAME = 'benefit-designer';
 const ALLOWED_ROLES = ['BenefitDesigner', 'Admin'];
-const PORTAL_URL = process.env.PORTAL_URL || 'https://apogee-insurance.vercel.app';
+const PORTAL_URL = process.env.PORTAL_URL;
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Skip auth for static files and API health checks
+  // Skip auth for static files, health checks, and seed endpoint
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/health') ||
+    pathname.startsWith('/api/seed') ||
     pathname === '/favicon.ico' ||
     pathname === '/unauthorized'
   ) {

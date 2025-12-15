@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL || 'https://apogee-insurance.vercel.app';
+const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL;
 
 export default function UnauthorizedPage() {
   return (
@@ -28,12 +28,14 @@ export default function UnauthorizedPage() {
           You do not have permission to access the Benefit Designer.
           Please contact your administrator if you believe this is an error.
         </p>
-        <Link
-          href={PORTAL_URL}
-          className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md transition-colors"
-        >
-          Return to Portal
-        </Link>
+        {PORTAL_URL && (
+          <Link
+            href={PORTAL_URL}
+            className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-md transition-colors"
+          >
+            Return to Portal
+          </Link>
+        )}
       </div>
     </div>
   );

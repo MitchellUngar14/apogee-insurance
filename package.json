@@ -16,7 +16,7 @@
     "dev:quoting": "npm run dev -w packages/quoting-service",
     "dev:customer": "npm run dev -w packages/customer-service",
     "dev:designer": "npm run dev -w packages/benefit-designer-service",
-    "dev:all": "concurrently \"npm run dev:quoting\" \"npm run dev:customer\" \"npm run dev:designer\"",
+    "dev:all": "concurrently \"npm run dev\" \"npm run dev:quoting\" \"npm run dev:customer\" \"npm run dev:designer\"",
     "build:quoting": "npm run build -w packages/quoting-service",
     "build:customer": "npm run build -w packages/customer-service",
     "build:designer": "npm run build -w packages/benefit-designer-service",

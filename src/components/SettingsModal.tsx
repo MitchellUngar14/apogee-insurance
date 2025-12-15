@@ -1,15 +1,16 @@
 // src/components/SettingsModal.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 type SettingsModalProps = {
   isOpen: boolean;
   onClose: () => void;
   toggleDarkMode: () => void;
+  onSignOut: () => void;
 };
 
-export default function SettingsModal({ isOpen, onClose, toggleDarkMode }: SettingsModalProps) {
+export default function SettingsModal({ isOpen, onClose, toggleDarkMode, onSignOut }: SettingsModalProps) {
   const [showAbout, setShowAbout] = useState(false);
 
   if (!isOpen) return null;
@@ -37,7 +38,7 @@ export default function SettingsModal({ isOpen, onClose, toggleDarkMode }: Setti
 
           {/* Sign Out Button */}
           <button
-            onClick={() => alert('Signing out...')}
+            onClick={onSignOut}
             className="w-full px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
           >
             Sign Out

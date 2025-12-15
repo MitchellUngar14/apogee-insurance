@@ -8,9 +8,18 @@ export default function DynamicHeader() {
   const { headerTitle, showHomeButton, setShowHomeButton, setHeaderTitle } = useHeader();
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
 
+  const PORTAL_URL = process.env.NEXT_PUBLIC_PORTAL_URL;
+
   const handleGoHome = () => {
     setHeaderTitle("Apogee Customer Service");
     setShowHomeButton(false);
+  };
+
+  const handleSignOut = () => {
+    // Clear the service token cookie
+    document.cookie = 'service_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    // Redirect to portal
+    window.location.href = PORTAL_URL || '/';
   };
 
   const toggleDarkMode = () => {
@@ -50,30 +59,33 @@ export default function DynamicHeader() {
   return (
     <>
       <div className="flex items-center justify-between w-full relative">
-        {showHomeButton && (
-          <button
-            onClick={handleGoHome}
-            className="px-4 py-2 text-white text-sm rounded-md hover:bg-soft-blue-600 transition-colors"
-            style={{ backgroundColor: '#0284c7' }}
-          >
-            Home
-          </button>
-        )}
-        <h1 className="text-2xl font-bold flex-grow text-center">
+        <div className="z-10">
+          {showHomeButton && (
+            <button
+              onClick={handleGoHome}
+              className="px-4 py-2 text-white text-sm rounded-md hover:bg-soft-blue-600 transition-colors"
+              style={{ backgroundColor: '#0284c7' }}
+            >
+              Home
+            </button>
+          )}
+        </div>
+        <h1 className="text-2xl font-bold absolute left-1/2 transform -translate-x-1/2">
           {renderHeaderTitle}
         </h1>
         <button
           onClick={() => setIsSettingsModalOpen(true)}
-          className="ml-auto p-2 text-white rounded-md hover:bg-soft-blue-600 transition-colors"
+          className="z-10 p-2 text-white rounded-md hover:bg-soft-green-600 transition-colors"
           style={{ backgroundColor: '#22c55e' }}
         >
-          Settings
+          ⚙️
         </button>
       </div>
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
         toggleDarkMode={toggleDarkMode}
+        onSignOut={handleSignOut}
       />
     </>
   );
